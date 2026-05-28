@@ -6,54 +6,50 @@
 <title>員工打卡系統</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
-@import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@700&family=Noto+Sans+TC:wght@400;700&display=swap");
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#060a0f;--bg2:#0d1117;--bg3:#161b22;--border:#1e2d3d;
-  --green:#00ff88;--amber:#ffb020;--red:#ff4757;--blue:#00b4ff;
-  --text:#e6edf3;--text2:#8b949e;--text3:#484f58;
-  --glow-g:0 0 20px rgba(0,255,136,.25);--glow-a:0 0 20px rgba(255,176,32,.25);
-}
+:root{--bg:#060a0f;--bg2:#0d1117;--bg3:#161b22;--border:#1e2d3d;--green:#00ff88;--amber:#ffb020;--red:#ff4757;--blue:#00b4ff;--text:#e6edf3;--text2:#8b949e;--text3:#484f58;--glow-g:0 0 20px rgba(0,255,136,.25);--glow-a:0 0 20px rgba(255,176,32,.25);}
 html,body{width:100%;min-height:100vh;background:var(--bg);color:var(--text);font-family:"Noto Sans TC",sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 .bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(0,180,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
 .bg-glow{position:fixed;top:-200px;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(0,255,136,.06) 0%,transparent 70%);pointer-events:none;z-index:0}
 .page{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;max-width:430px;margin:0 auto;padding:0 0 48px}
 .hdr{padding:20px 20px 16px;border-bottom:1px solid var(--border)}
 .hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
-.logo{font-family:"Rajdhani",sans-serif;font-size:11px;font-weight:600;letter-spacing:.2em;color:var(--green);text-transform:uppercase}
+.logo{font-family:"Rajdhani",sans-serif;font-size:11px;font-weight:700;letter-spacing:.2em;color:var(--green);text-transform:uppercase}
 .sys-status{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,255,136,.4)}50%{opacity:.7;box-shadow:0 0 0 6px rgba(0,255,136,0)}}
-.hdr-title{font-family:"Rajdhani",sans-serif;font-size:26px;font-weight:700;letter-spacing:.05em;color:var(--text)}
+.hdr-title{font-family:"Rajdhani",sans-serif;font-size:26px;font-weight:700;letter-spacing:.05em}
 .hdr-title span{color:var(--green)}
 .main{flex:1;padding:16px 16px 0}
-.profile-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:12px;position:relative;overflow:hidden}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin-bottom:12px}
+.profile-card{padding:14px 16px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden}
 .profile-card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--green),transparent)}
-.av{width:46px;height:46px;border-radius:50%;border:2px solid var(--green);object-fit:cover;flex-shrink:0;background:var(--bg3)}
-.av-ph{width:46px;height:46px;border-radius:50%;border:2px solid var(--green);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--green);flex-shrink:0;font-family:"Rajdhani",sans-serif}
+.av{width:46px;height:46px;border-radius:50%;border:2px solid var(--green);object-fit:cover;flex-shrink:0}
+.av-ph{width:46px;height:46px;border-radius:50%;border:2px solid var(--green);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--green);flex-shrink:0}
 .p-info{flex:1;min-width:0}
-.p-name{font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-name{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .p-id{font-size:10px;color:var(--text3);margin-top:2px;font-family:monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .badge-ok{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;background:rgba(0,255,136,.1);color:var(--green);border:1px solid rgba(0,255,136,.3);flex-shrink:0}
 .p-loading{display:flex;align-items:center;gap:8px;color:var(--text2);font-size:13px}
-.clock-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px 16px;text-align:center;margin-bottom:12px;position:relative;overflow:hidden}
+.clock-card{padding:20px 16px;text-align:center;position:relative;overflow:hidden}
 .clock-card::after{content:"";position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--blue),transparent)}
-.clock-date{font-size:12px;color:var(--text2);letter-spacing:.08em;margin-bottom:4px}
-.clock-time{font-family:"Rajdhani",sans-serif;font-size:52px;font-weight:700;letter-spacing:.04em;color:var(--text);line-height:1;font-variant-numeric:tabular-nums}
-.clock-time .colon{color:var(--green);animation:blink 1s step-end infinite}
+.c-date{font-size:12px;color:var(--text2);letter-spacing:.08em;margin-bottom:4px}
+.c-time{font-family:"Rajdhani",sans-serif;font-size:52px;font-weight:700;letter-spacing:.04em;line-height:1;font-variant-numeric:tabular-nums}
+.c-time .col{color:var(--green);animation:blink 1s step-end infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.clock-day{font-size:12px;color:var(--text2);margin-top:4px;letter-spacing:.1em}
-.gps-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.gps-icon{font-size:18px;flex-shrink:0}
+.c-day{font-size:12px;color:var(--text2);margin-top:4px;letter-spacing:.1em}
+.gps-card{padding:12px 16px;display:flex;align-items:center;gap:10px}
+.gps-ico{font-size:18px;flex-shrink:0}
 .gps-info{flex:1;min-width:0}
-.gps-label{color:var(--text2);font-size:10px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
+.gps-lbl{color:var(--text2);font-size:10px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
 .gps-val{color:var(--text);font-family:monospace;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gps-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:100px;flex-shrink:0;letter-spacing:.04em}
-.gps-badge.wait{background:rgba(255,176,32,.1);color:var(--amber);border:1px solid rgba(255,176,32,.3)}
-.gps-badge.got{background:rgba(0,255,136,.1);color:var(--green);border:1px solid rgba(0,255,136,.3)}
-.gps-badge.fail{background:rgba(255,71,87,.1);color:var(--red);border:1px solid rgba(255,71,87,.3)}
-.note-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:16px}
-.note-label{font-size:10px;color:var(--text2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.gbadge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:100px;flex-shrink:0;letter-spacing:.04em}
+.gbadge.wait{background:rgba(255,176,32,.1);color:var(--amber);border:1px solid rgba(255,176,32,.3)}
+.gbadge.got{background:rgba(0,255,136,.1);color:var(--green);border:1px solid rgba(0,255,136,.3)}
+.gbadge.fail{background:rgba(255,71,87,.1);color:var(--red);border:1px solid rgba(255,71,87,.3)}
+.note-card{padding:12px 16px;margin-bottom:16px}
+.note-lbl{font-size:10px;color:var(--text2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
 .note-ta{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text);font-family:inherit;resize:none;outline:none;transition:border-color .2s}
 .note-ta:focus{border-color:var(--green)}
 .note-ta::placeholder{color:var(--text3)}
@@ -72,8 +68,8 @@ html,body{width:100%;min-height:100vh;background:var(--bg);color:var(--text);fon
 .btn-out .btn-lbl{font-family:"Rajdhani",sans-serif;font-size:17px;font-weight:700;color:var(--amber);letter-spacing:.06em}
 .btn-out .btn-sub{font-size:10px;color:rgba(255,176,32,.6);letter-spacing:.1em}
 .btn-ico{font-size:28px;line-height:1}
-.btn-spinner{display:none;width:24px;height:24px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
-.btn.loading .btn-spinner{display:block}
+.btn-sp{display:none;width:24px;height:24px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+.btn.loading .btn-sp{display:block}
 .btn.loading .bc{opacity:0}
 @keyframes sp{to{transform:translate(-50%,-50%) rotate(360deg)}}
 .rec-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
@@ -81,9 +77,9 @@ html,body{width:100%;min-height:100vh;background:var(--bg);color:var(--text);fon
 .rec-hdr::before{content:"";width:3px;height:12px;background:var(--green);border-radius:2px;flex-shrink:0}
 .rec-row{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border)}
 .rec-row:last-child{border-bottom:none}
-.rec-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;flex-shrink:0;font-family:"Rajdhani",sans-serif;letter-spacing:.06em}
-.rec-badge.in{background:rgba(0,255,136,.1);color:var(--green);border:1px solid rgba(0,255,136,.3)}
-.rec-badge.out{background:rgba(255,176,32,.1);color:var(--amber);border:1px solid rgba(255,176,32,.3)}
+.rbadge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;flex-shrink:0;font-family:"Rajdhani",sans-serif;letter-spacing:.06em}
+.rbadge.in{background:rgba(0,255,136,.1);color:var(--green);border:1px solid rgba(0,255,136,.3)}
+.rbadge.out{background:rgba(255,176,32,.1);color:var(--amber);border:1px solid rgba(255,176,32,.3)}
 .rec-time{font-size:14px;font-weight:700;color:var(--text);font-family:"Rajdhani",sans-serif}
 .rec-gps{font-size:10px;color:var(--text3);font-family:monospace}
 .rec-empty{padding:20px 16px;text-align:center;color:var(--text3);font-size:13px}
@@ -107,45 +103,36 @@ html,body{width:100%;min-height:100vh;background:var(--bg);color:var(--text);fon
 <div id="mask"><div class="mask-ring"></div><div class="mask-txt">系統啟動中…</div></div>
 <div class="page">
   <header class="hdr">
-    <div class="hdr-top">
-      <div class="logo">Attendance System</div>
-      <div class="sys-status"><div class="dot"></div><span>ONLINE</span></div>
-    </div>
+    <div class="hdr-top"><div class="logo">Attendance System</div><div class="sys-status"><div class="dot"></div><span>ONLINE</span></div></div>
     <div class="hdr-title">員工<span>打卡</span>系統</div>
   </header>
   <div class="tw" id="tw"></div>
   <main class="main">
-    <div class="profile-card" id="profileCard">
-      <div class="p-loading">
-        <div style="width:14px;height:14px;border:2px solid #1e2d3d;border-top-color:#00ff88;border-radius:50%;animation:sp .7s linear infinite;flex-shrink:0"></div>
-        載入 LINE 帳號中…
-      </div>
+    <div class="card profile-card" id="profileCard">
+      <div class="p-loading"><div style="width:14px;height:14px;border:2px solid #1e2d3d;border-top-color:#00ff88;border-radius:50%;animation:sp .7s linear infinite;flex-shrink:0"></div>&nbsp;載入 LINE 帳號中…</div>
     </div>
-    <div class="clock-card">
-      <div class="clock-date" id="cDate">─</div>
-      <div class="clock-time"><span id="cH">--</span><span class="colon">:</span><span id="cM">--</span><span class="colon">:</span><span id="cS">--</span></div>
-      <div class="clock-day" id="cDay">─</div>
+    <div class="card clock-card">
+      <div class="c-date" id="cDate">─</div>
+      <div class="c-time"><span id="cH">--</span><span class="col">:</span><span id="cM">--</span><span class="col">:</span><span id="cS">--</span></div>
+      <div class="c-day" id="cDay">─</div>
     </div>
-    <div class="gps-card">
-      <span class="gps-icon">📡</span>
-      <div class="gps-info">
-        <div class="gps-label">GPS Location</div>
-        <div class="gps-val" id="gpsVal">正在取得座標…</div>
-      </div>
-      <span class="gps-badge wait" id="gpsBadge">WAIT</span>
+    <div class="card gps-card">
+      <span class="gps-ico">📡</span>
+      <div class="gps-info"><div class="gps-lbl">GPS Location</div><div class="gps-val" id="gpsVal">正在取得座標…</div></div>
+      <span class="gbadge wait" id="gpsBadge">WAIT</span>
     </div>
-    <div class="note-card">
-      <div class="note-label">Remark / 備註（選填）</div>
+    <div class="card note-card">
+      <div class="note-lbl">Remark / 備註（選填）</div>
       <textarea class="note-ta" id="note" rows="2" placeholder="如有需要補充的事項，請在此輸入…" maxlength="100"></textarea>
     </div>
     <div class="btns">
       <button class="btn btn-in" id="btnIn" onclick="doCheck('上班')">
         <div class="bc"><div class="btn-ico">▶</div><div class="btn-lbl">上班打卡</div><div class="btn-sub">CHECK IN</div></div>
-        <div class="btn-spinner"></div>
+        <div class="btn-sp"></div>
       </button>
       <button class="btn btn-out" id="btnOut" onclick="doCheck('下班')">
         <div class="bc"><div class="btn-ico">■</div><div class="btn-lbl">下班打卡</div><div class="btn-sub">CHECK OUT</div></div>
-        <div class="btn-spinner"></div>
+        <div class="btn-sp"></div>
       </button>
     </div>
     <div class="rec-wrap">
@@ -154,8 +141,9 @@ html,body{width:100%;min-height:100vh;background:var(--bg);color:var(--text);fon
     </div>
   </main>
 </div>
+
 <script>
-// ★ 填入你的資料
+// ★ 你的設定（已填好，不需要改）
 var GAS_URL = 'https://script.google.com/macros/s/AKfycby1eKOhEXh26oXEUneB6l6fQyQ0GqltLndoxFeHsizK_rlUHzFRGD1UBwJpK4PzJZqL/exec';
 var LIFF_ID = '2010225565-nFUkSOcC';
 
@@ -168,22 +156,22 @@ function tick() {
   document.getElementById('cH').textContent = p(n.getHours());
   document.getElementById('cM').textContent = p(n.getMinutes());
   document.getElementById('cS').textContent = p(n.getSeconds());
-  document.getElementById('cDate').textContent = n.getFullYear() + ' / ' + (n.getMonth()+1) + ' / ' + n.getDate();
+  document.getElementById('cDate').textContent = n.getFullYear()+' / '+(n.getMonth()+1)+' / '+n.getDate();
   document.getElementById('cDay').textContent = DAYS[n.getDay()];
 }
 setInterval(tick, 1000); tick();
 
 // GPS
 function startGPS() {
-  if (!navigator.geolocation) { setGPS('fail','不支援 GPS','FAIL'); return; }
+  if (!navigator.geolocation) { setGPS('fail','不支援GPS','FAIL'); return; }
   navigator.geolocation.getCurrentPosition(
     function(p) {
       gps = { lat: p.coords.latitude, lng: p.coords.longitude, acc: Math.round(p.coords.accuracy) };
-      setGPS('got', gps.lat.toFixed(6) + ',  ' + gps.lng.toFixed(6) + '   ±' + gps.acc + 'm', 'GOT');
+      setGPS('got', gps.lat.toFixed(6)+',  '+gps.lng.toFixed(6)+'  ±'+gps.acc+'m', 'GOT');
     },
     function(e) {
-      var m = {1:'請允許位置存取權限', 2:'無法取得 GPS 訊號', 3:'定位逾時'};
-      setGPS('fail', m[e.code] || '定位失敗', 'FAIL');
+      var m = {1:'請允許位置存取', 2:'無法取得GPS', 3:'定位逾時'};
+      setGPS('fail', m[e.code]||'定位失敗', 'FAIL');
     },
     { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
   );
@@ -191,7 +179,7 @@ function startGPS() {
 function setGPS(cls, val, label) {
   document.getElementById('gpsVal').textContent = val;
   var b = document.getElementById('gpsBadge');
-  b.className = 'gps-badge ' + cls; b.textContent = label;
+  b.className = 'gbadge ' + cls; b.textContent = label;
 }
 startGPS();
 
@@ -199,39 +187,24 @@ startGPS();
 function hideMask() {
   var m = document.getElementById('mask');
   m.classList.add('hide');
-  setTimeout(function(){ m.style.display = 'none'; }, 450);
+  setTimeout(function(){ m.style.display='none'; }, 450);
 }
 function renderProfile(p) {
-  var av = p.pic
-    ? '<img class="av" src="' + p.pic + '" alt=""/>'
-    : '<div class="av-ph">' + (p.name[0] || '?') + '</div>';
+  var av = p.pic ? '<img class="av" src="'+p.pic+'" alt="">' : '<div class="av-ph">'+p.name[0]+'</div>';
   document.getElementById('profileCard').innerHTML =
-    av + '<div class="p-info"><div class="p-name">' + esc(p.name) + '</div>'
-    + '<div class="p-id">' + esc(p.id) + '</div></div>'
-    + '<div class="badge-ok">VERIFIED</div>';
+    av + '<div class="p-info"><div class="p-name">'+esc(p.name)+'</div><div class="p-id">'+esc(p.id)+'</div></div><div class="badge-ok">VERIFIED</div>';
 }
 liff.init({ liffId: LIFF_ID })
-  .then(function() {
-    if (!liff.isLoggedIn()) { liff.login(); return; }
-    return liff.getProfile();
-  })
-  .then(function(p) {
-    if (!p) return;
-    me = { id: p.userId, name: p.displayName, pic: p.pictureUrl };
-    renderProfile(me);
-    hideMask();
-  })
-  .catch(function(e) {
-    console.error(e);
-    hideMask();
-    toast('⚠ 請從 LINE 內開啟此頁面', 'wn', 8000);
-  });
+  .then(function() { if (!liff.isLoggedIn()) { liff.login(); return; } return liff.getProfile(); })
+  .then(function(p) { if (!p) return; me = { id: p.userId, name: p.displayName, pic: p.pictureUrl }; renderProfile(me); hideMask(); })
+  .catch(function(e) { console.error(e); hideMask(); toast('⚠ 請從LINE內開啟此頁面', 'wn', 8000); });
 
-// 打卡（使用 no-cors 模式，解決跨網域問題）
+// 打卡（JSONP 方式，完全不受跨網域限制）
+var cbCount = 0;
 function doCheck(type) {
   if (busy) return;
-  if (!me)  { toast('LINE 帳號尚未就緒', 'err'); return; }
-  if (!gps) { toast('GPS 尚未取得，請稍候', 'wn'); return; }
+  if (!me)  { toast('LINE帳號尚未就緒', 'err'); return; }
+  if (!gps) { toast('GPS尚未取得，請稍候', 'wn'); return; }
 
   var bid = type === '上班' ? 'btnIn' : 'btnOut';
   var oid = type === '上班' ? 'btnOut' : 'btnIn';
@@ -239,48 +212,63 @@ function doCheck(type) {
   busy = true; btn.classList.add('loading'); btn.disabled = true;
   document.getElementById(oid).disabled = true;
 
-  var payload = JSON.stringify({
-    lineUserId: me.id, displayName: me.name,
-    checkType: type,
-    latitude: gps.lat, longitude: gps.lng, accuracy: gps.acc,
-    note: document.getElementById('note').value.trim(),
-    userAgent: navigator.userAgent
-  });
+  // 每次用不同的 callback 名稱，避免衝突
+  var cbName = '_cb' + Date.now() + (cbCount++);
 
-  // no-cors：送出去不等回應，直接顯示成功
-  // 資料一定會寫進試算表，只是我們收不到 GAS 的回傳訊息
-  fetch(GAS_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: payload
-  })
-  .then(function() {
-    var now = new Date();
-    var p = function(x){ return String(x).padStart(2,'0'); };
-    var timeStr = now.getFullYear() + '-' + p(now.getMonth()+1) + '-' + p(now.getDate())
-      + ' ' + p(now.getHours()) + ':' + p(now.getMinutes()) + ':' + p(now.getSeconds());
-    toast('✅ ' + type + '打卡完成！\n' + timeStr, 'ok');
-    addRec(type, timeStr, gps.lat, gps.lng);
-    document.getElementById('note').value = '';
-    lockBtn(btn, type === '上班' ? 'CHECK IN' : 'CHECK OUT', 60);
-  })
-  .catch(function(e) {
-    console.error(e);
-    toast('✖ 送出失敗，請確認網路後再試', 'err');
-  })
-  .finally(function() {
+  var payload = encodeURIComponent(JSON.stringify({
+    lineUserId:  me.id,
+    displayName: me.name,
+    checkType:   type,
+    latitude:    gps.lat,
+    longitude:   gps.lng,
+    accuracy:    gps.acc,
+    note:        document.getElementById('note').value.trim(),
+    userAgent:   navigator.userAgent
+  }));
+
+  // 建立 callback 函式，GAS 回傳後會呼叫它
+  var s;
+  window[cbName] = function(d) {
+    // 清理
+    delete window[cbName];
+    if (s && s.parentNode) s.parentNode.removeChild(s);
+    // 解除按鈕鎖定
     btn.classList.remove('loading'); busy = false;
     document.getElementById(oid).disabled = false;
     if (!btn.dataset.locked) btn.disabled = false;
-  });
+    // 處理結果
+    if (d.ok) {
+      var n = new Date(), p = function(x){ return String(x).padStart(2,'0'); };
+      var t = n.getFullYear()+'-'+p(n.getMonth()+1)+'-'+p(n.getDate())+' '+p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
+      toast('✅ ' + type + '打卡完成！\n' + t, 'ok');
+      addRec(type, t, gps.lat, gps.lng);
+      document.getElementById('note').value = '';
+      lockBtn(btn, type === '上班' ? 'CHECK IN' : 'CHECK OUT', 60);
+    } else if (d.duplicate) {
+      toast('⚠ ' + d.msg, 'wn');
+    } else {
+      toast('✖ ' + (d.msg || '打卡失敗'), 'err');
+    }
+  };
+
+  // 用 <script> 標籤送出，完全沒有跨網域問題
+  s = document.createElement('script');
+  s.src = GAS_URL + '?payload=' + payload + '&callback=' + cbName;
+  s.onerror = function() {
+    delete window[cbName];
+    btn.classList.remove('loading'); busy = false;
+    document.getElementById(oid).disabled = false;
+    if (!btn.dataset.locked) btn.disabled = false;
+    toast('✖ 網路錯誤，請稍後再試', 'err');
+  };
+  document.head.appendChild(s);
 }
 
 function lockBtn(btn, label, sec) {
   btn.dataset.locked = '1'; btn.disabled = true;
   var r = sec, sub = btn.querySelector('.btn-sub');
   var t = setInterval(function() {
-    r--; sub.textContent = r + 's 後解鎖';
+    r--; sub.textContent = r + 's後解鎖';
     if (r <= 0) { clearInterval(t); btn.disabled = false; btn.dataset.locked = ''; sub.textContent = label; }
   }, 1000);
 }
@@ -290,10 +278,8 @@ function addRec(type, time, lat, lng) {
   var e = list.querySelector('.rec-empty'); if (e) e.remove();
   var row = document.createElement('div'); row.className = 'rec-row';
   var t = String(time).split(' ')[1] || time;
-  row.innerHTML = '<span class="rec-badge ' + (type==='上班'?'in':'out') + '">'
-    + (type==='上班'?'IN':'OUT') + '</span>'
-    + '<div><div class="rec-time">' + esc(t) + '</div>'
-    + '<div class="rec-gps">' + lat.toFixed(5) + ',  ' + lng.toFixed(5) + '</div></div>';
+  row.innerHTML = '<span class="rbadge '+(type==='上班'?'in':'out')+'">'+(type==='上班'?'IN':'OUT')+'</span>'
+    + '<div><div class="rec-time">'+esc(t)+'</div><div class="rec-gps">'+lat.toFixed(5)+',  '+lng.toFixed(5)+'</div></div>';
   list.prepend(row);
 }
 
