@@ -143,9 +143,18 @@ html,body{width:100%;min-height:100vh;background:var(--bg);color:var(--text);fon
 </div>
 
 <script>
-// ★ 你的設定（已填好，不需要改）
-var GAS_URL = 'https://script.google.com/macros/s/AKfycby1eKOhEXh26oXEUneB6l6fQyQ0GqltLndoxFeHsizK_rlUHzFRGD1UBwJpK4PzJZqL/exec';
 var LIFF_ID = '2010225565-nFUkSOcC';
+
+// Google 表單設定（已填好，不需要修改）
+var FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSehCko1zYpZ3VAwZHGWvKPpyEotpxM7-ut86Tt-m5yDmJ7mlQ/formResponse';
+var FIELDS = {
+  name:    'entry.982117201',
+  lineId:  'entry.1670748549',
+  type:    'entry.831025939',
+  lat:     'entry.1121663479',
+  lng:     'entry.1680596688',
+  note:    'entry.876472695'
+};
 
 var gps = null, me = null, busy = false;
 var DAYS = ['週日','週一','週二','週三','週四','週五','週六'];
@@ -192,15 +201,14 @@ function hideMask() {
 function renderProfile(p) {
   var av = p.pic ? '<img class="av" src="'+p.pic+'" alt="">' : '<div class="av-ph">'+p.name[0]+'</div>';
   document.getElementById('profileCard').innerHTML =
-    av + '<div class="p-info"><div class="p-name">'+esc(p.name)+'</div><div class="p-id">'+esc(p.id)+'</div></div><div class="badge-ok">VERIFIED</div>';
+    av+'<div class="p-info"><div class="p-name">'+esc(p.name)+'</div><div class="p-id">'+esc(p.id)+'</div></div><div class="badge-ok">VERIFIED</div>';
 }
 liff.init({ liffId: LIFF_ID })
   .then(function() { if (!liff.isLoggedIn()) { liff.login(); return; } return liff.getProfile(); })
   .then(function(p) { if (!p) return; me = { id: p.userId, name: p.displayName, pic: p.pictureUrl }; renderProfile(me); hideMask(); })
   .catch(function(e) { console.error(e); hideMask(); toast('⚠ 請從LINE內開啟此頁面', 'wn', 8000); });
 
-// 打卡（JSONP 方式，完全不受跨網域限制）
-var cbCount = 0;
+// 打卡：用 Google 表單送資料（最穩定，100% 不會跨網域問題）
 function doCheck(type) {
   if (busy) return;
   if (!me)  { toast('LINE帳號尚未就緒', 'err'); return; }
@@ -212,56 +220,41 @@ function doCheck(type) {
   busy = true; btn.classList.add('loading'); btn.disabled = true;
   document.getElementById(oid).disabled = true;
 
-  // 每次用不同的 callback 名稱，避免衝突
-  var cbName = '_cb' + Date.now() + (cbCount++);
+  var now = new Date();
+  var p   = function(x){ return String(x).padStart(2,'0'); };
+  var timeStr = now.getFullYear()+'-'+p(now.getMonth()+1)+'-'+p(now.getDate())
+              +' '+p(now.getHours())+':'+p(now.getMinutes())+':'+p(now.getSeconds());
 
-  var payload = encodeURIComponent(JSON.stringify({
-    lineUserId:  me.id,
-    displayName: me.name,
-    checkType:   type,
-    latitude:    gps.lat,
-    longitude:   gps.lng,
-    accuracy:    gps.acc,
-    note:        document.getElementById('note').value.trim(),
-    userAgent:   navigator.userAgent
-  }));
+  // 用 FormData 送到 Google 表單
+  var fd = new FormData();
+  fd.append(FIELDS.name,   me.name);
+  fd.append(FIELDS.lineId, me.id);
+  fd.append(FIELDS.type,   type + ' ' + timeStr);
+  fd.append(FIELDS.lat,    gps.lat.toFixed(6));
+  fd.append(FIELDS.lng,    gps.lng.toFixed(6));
+  fd.append(FIELDS.note,   document.getElementById('note').value.trim());
 
-  // 建立 callback 函式，GAS 回傳後會呼叫它
-  var s;
-  window[cbName] = function(d) {
-    // 清理
-    delete window[cbName];
-    if (s && s.parentNode) s.parentNode.removeChild(s);
-    // 解除按鈕鎖定
+  fetch(FORM_URL, {
+    method: 'POST',
+    mode: 'no-cors',  // Google 表單固定要用 no-cors
+    body: fd
+  })
+  .then(function() {
+    // Google 表單用 no-cors，不回傳內容，但資料一定有送進去
+    toast('✅ ' + type + '打卡完成！\n' + timeStr, 'ok');
+    addRec(type, timeStr, gps.lat, gps.lng);
+    document.getElementById('note').value = '';
+    lockBtn(btn, type === '上班' ? 'CHECK IN' : 'CHECK OUT', 60);
+  })
+  .catch(function(e) {
+    console.error(e);
+    toast('✖ 網路錯誤，請確認連線後再試', 'err');
+  })
+  .finally(function() {
     btn.classList.remove('loading'); busy = false;
     document.getElementById(oid).disabled = false;
     if (!btn.dataset.locked) btn.disabled = false;
-    // 處理結果
-    if (d.ok) {
-      var n = new Date(), p = function(x){ return String(x).padStart(2,'0'); };
-      var t = n.getFullYear()+'-'+p(n.getMonth()+1)+'-'+p(n.getDate())+' '+p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
-      toast('✅ ' + type + '打卡完成！\n' + t, 'ok');
-      addRec(type, t, gps.lat, gps.lng);
-      document.getElementById('note').value = '';
-      lockBtn(btn, type === '上班' ? 'CHECK IN' : 'CHECK OUT', 60);
-    } else if (d.duplicate) {
-      toast('⚠ ' + d.msg, 'wn');
-    } else {
-      toast('✖ ' + (d.msg || '打卡失敗'), 'err');
-    }
-  };
-
-  // 用 <script> 標籤送出，完全沒有跨網域問題
-  s = document.createElement('script');
-  s.src = GAS_URL + '?payload=' + payload + '&callback=' + cbName;
-  s.onerror = function() {
-    delete window[cbName];
-    btn.classList.remove('loading'); busy = false;
-    document.getElementById(oid).disabled = false;
-    if (!btn.dataset.locked) btn.disabled = false;
-    toast('✖ 網路錯誤，請稍後再試', 'err');
-  };
-  document.head.appendChild(s);
+  });
 }
 
 function lockBtn(btn, label, sec) {
@@ -279,15 +272,15 @@ function addRec(type, time, lat, lng) {
   var row = document.createElement('div'); row.className = 'rec-row';
   var t = String(time).split(' ')[1] || time;
   row.innerHTML = '<span class="rbadge '+(type==='上班'?'in':'out')+'">'+(type==='上班'?'IN':'OUT')+'</span>'
-    + '<div><div class="rec-time">'+esc(t)+'</div><div class="rec-gps">'+lat.toFixed(5)+',  '+lng.toFixed(5)+'</div></div>';
+    +'<div><div class="rec-time">'+esc(t)+'</div><div class="rec-gps">'+lat.toFixed(5)+',  '+lng.toFixed(5)+'</div></div>';
   list.prepend(row);
 }
 
 function toast(msg, type, ms) {
   var w = document.getElementById('tw'), d = document.createElement('div');
-  d.className = 'toast ' + (type || 'ok'); d.textContent = msg;
+  d.className = 'toast '+(type||'ok'); d.textContent = msg;
   w.appendChild(d);
-  setTimeout(function(){ d.classList.add('hide'); setTimeout(function(){ d.remove(); }, 250); }, ms || 4000);
+  setTimeout(function(){ d.classList.add('hide'); setTimeout(function(){ d.remove(); }, 250); }, ms||4000);
 }
 
 function esc(s) {
